@@ -1,10 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+const { body, validationResult } = require('express-validator');
 
 var app = express();
 app.use(bodyParser.json());
-var fs = require("fs");
-const { cpuUsage } = require('process');
+app.use(express.json());
 
 function generate_number(digits) {
     var x = Math.pow(10, digits);
@@ -47,7 +47,7 @@ function generate_options(answer, digits_in_subtrahend) {
     if (digits_in_subtrahend < 2) {
         options.push(answer + Math.ceil(answer/10));
         options.push(answer - Math.ceil(answer/10));
-        options.push(answer - subtrahend);
+        options.push(answer - 1);
         return options;
     }
     if (digits_in_subtrahend > 5) {
@@ -65,9 +65,18 @@ function generate_options(answer, digits_in_subtrahend) {
     return options;
 }
 
-app.post('/generate_subtraction_mcq', function (req, res) {
+app.post('/generate_subtraction_mcq', [
+    body('num_question').isNumeric(),
+    body('minuend_digits').isNumeric(),
+    body('subtrahend_digits').isNumeric(),
+  ],
+function (req, res) {
     const input = req.body;
     // console.log(input)
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     const num_of_question = input.num_question;
     const digits_in_minuend = input.minuend_digits;
     const digits_in_subtrahend = input.subtrahend_digits;
