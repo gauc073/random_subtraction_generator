@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/gauc073/random_subtraction_generator#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.3"
   }
 }
